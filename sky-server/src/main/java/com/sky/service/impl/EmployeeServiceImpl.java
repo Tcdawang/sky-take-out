@@ -1,23 +1,31 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
+import com.sky.dto.EmployeeEditPswDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
-import com.sky.exception.AccountLockedException;
-import com.sky.exception.AccountNotFoundException;
-import com.sky.exception.EmployeeIsExistException;
-import com.sky.exception.PasswordErrorException;
+import com.sky.exception.*;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
+import com.sky.vo.EmployeePageVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import java.util.List;
+
+@Slf4j
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
@@ -63,7 +71,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void insertEmployee(EmployeeDTO employeeDTO) {
         //更具用户名查询 该用户名是否存在
         Employee employee = employeeMapper.getByUsername(employeeDTO.getUsername());
-        if (employee != null){
+        if (employee != null) {
             throw new EmployeeIsExistException(MessageConstant.EMPLOYEE_IS_EXIST);
         }
         //如果不存在则创建实体类 为其赋值 如果一个一个调用set方法会很麻烦 可以使用spring提供的属性拷贝的工具类BeanUtil
@@ -81,4 +89,59 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeMapper.insertEmployee(newEmp);
     }
 
+    @Override
+    public PageResult<EmployeePageVO> queryPage(EmployeePageQueryDTO employeePageQueryDTO) {
+        PageResult<EmployeePageVO> pr = new PageResult<>();
+        //开启分页查询
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+
+        //调用mapper方法
+        List<Employee> employees = employeeMapper.queryPage(employeePageQueryDTO.getName());
+
+        //通过stream流将employee 都转换成 employeePageVO
+        List<EmployeePageVO> employeePageVOS = employees.stream().map(employee -> {
+            EmployeePageVO employeePageVO = new EmployeePageVO();
+            BeanUtils.copyProperties(employee, employeePageVO);
+            return employeePageVO;
+        }).toList();
+        log.info("数据为：{}", employeePageVOS);
+        //获取查询总数
+        pr.setTotal(employeePageVOS.size());
+        //获取查询结果
+        pr.setRecords(employeePageVOS);
+        return pr;
+    }
+
+    @Override
+    public void updatePassword(EmployeeEditPswDTO employeeEditPswDTO) {
+        log.info("前端密码值:{}", employeeEditPswDTO);
+        //获取前端传来的参数值
+        String newPassword = employeeEditPswDTO.getNewPassword();
+        String oldPassword = employeeEditPswDTO.getOldPassword();
+
+        //更具ThreadLocal获取此时人的id
+        Long currentId = BaseContext.getCurrentId();
+        //根据id查询当前用户是否存在
+        Employee employee = employeeMapper.selectById(currentId);
+        //判断原始密码是否正确
+        if (!DigestUtils.md5DigestAsHex(oldPassword.getBytes()).equals(employee.getPassword())){
+            throw new PasswordEditFailedException(MessageConstant.PASSWORD_EDIT_FAILED_OLDPSW);
+        }
+
+        //判断两次修改的密码是否一致
+        if (newPassword.equals(oldPassword)){
+            throw new PasswordEditFailedException(MessageConstant.PASSWORD_EDIT_FAILED_SAME);
+        }
+
+
+        //加密密码
+        String newPsw = DigestUtils.md5DigestAsHex(newPassword.getBytes());
+        //创建员工对象
+        Employee newEmployee = new Employee();
+        newEmployee.setId(currentId);
+        newEmployee.setPassword(newPsw);
+        newEmployee.setUpdateUser(currentId);
+        //调用mapper修改密码
+        employeeMapper.updatePassword(newEmployee);
+    }
 }

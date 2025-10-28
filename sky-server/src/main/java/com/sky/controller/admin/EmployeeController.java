@@ -2,22 +2,25 @@ package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
+import com.sky.dto.EmployeeEditPswDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
+import com.sky.vo.EmployeePageVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,6 +80,11 @@ public class EmployeeController {
         return Result.success();
     }
 
+    /**
+     * 添加员工
+     * @param employeeDTO
+     * @return
+     */
     @PostMapping
     @ApiOperation(value = "添加员工")
     public Result insertEmployee(@RequestBody EmployeeDTO employeeDTO){
@@ -84,4 +92,21 @@ public class EmployeeController {
         return Result.success();
     }
 
+    /**
+     *
+     * @param employeePageQueryDTO
+     * @return
+     */
+    @GetMapping("/page")
+    @ApiOperation(value = "分页查询")
+   public Result<PageResult<EmployeePageVO>> queryPage(EmployeePageQueryDTO employeePageQueryDTO){
+        PageResult<EmployeePageVO> employeePageVOPageResult = employeeService.queryPage(employeePageQueryDTO);
+        return Result.success(employeePageVOPageResult);
+    }
+    @PutMapping("/editPassword")
+    @ApiOperation(value = "修改密码")
+    public Result updatePassword(@RequestBody EmployeeEditPswDTO employeeEditPswDTO){
+        employeeService.updatePassword(employeeEditPswDTO);
+        return Result.success();
+    }
 }

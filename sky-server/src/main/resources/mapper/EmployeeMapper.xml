@@ -8,4 +8,20 @@
         values (#{name}, #{username}, #{password}, #{phone}, #{sex}, #{idNumber}, #{status},
                 now(), now(), #{createUser}, #{updateUser})
     </insert>
+    <update id="updatePassword">
+        update employee
+        set password=#{password},
+            update_time=now(),
+            update_user=#{updateUser}
+        where id=#{id}
+    </update>
+    <select id="queryPage" resultType="com.sky.entity.Employee">
+        select * from employee
+        order by update_time desc
+        <where>
+            <if test="name != null and name !=''">
+                name like concat('%' , #{name} , '%')
+            </if>
+        </where>
+    </select>
 </mapper>
