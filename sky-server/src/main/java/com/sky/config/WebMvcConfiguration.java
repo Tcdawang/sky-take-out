@@ -38,7 +38,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     }
 
     /**
-     * 通过knife4j生成接口文档
+     * 通过knife4j生成接口文档 这个是一个封装了Swagger的一个框架 用来帮我们生成接口文档 来测试接口的
      * @return
      */
     @Bean

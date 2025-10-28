@@ -5,6 +5,9 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
+/**
+ * 更具姓名查询员工并进行分页
+ */
 public class EmployeePageQueryDTO implements Serializable {
 
     //员工姓名

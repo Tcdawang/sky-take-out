@@ -28,9 +28,9 @@ public class Employee implements Serializable {
 
     private String sex;
 
-    private String idNumber;
+    private String idNumber;//身份证号码
 
-    private Integer status;
+    private Integer status;//状态 1:启用  2:禁用
 
     //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
