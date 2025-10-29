@@ -16,11 +16,8 @@ import com.sky.vo.EmployeePageVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import javax.swing.text.html.parser.Entity;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,6 +104,24 @@ public class EmployeeController {
     @ApiOperation(value = "修改密码")
     public Result updatePassword(@RequestBody EmployeeEditPswDTO employeeEditPswDTO){
         employeeService.updatePassword(employeeEditPswDTO);
+        return Result.success();
+    }
+    @PostMapping("/status/{status}")
+    @ApiOperation(value = "启用or禁用员工号码")
+    public Result stopAndStart(@PathVariable("status") Integer status,Long id){
+        employeeService.stopAndStart(status, id);
+        return Result.success();
+    }
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询员工")
+    public Result<Employee> selectById(@PathVariable Long id){
+        Employee employee = employeeService.selectById(id);
+        return Result.success(employee);
+    }
+    @PutMapping
+    @ApiOperation("编辑员工")
+    public Result updateEmp(@RequestBody EmployeeDTO employeeDTO){
+        employeeService.updateEmp(employeeDTO);
         return Result.success();
     }
 }

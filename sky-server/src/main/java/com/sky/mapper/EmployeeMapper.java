@@ -26,6 +26,12 @@ public interface EmployeeMapper {
      * 修改密码
      */
     void updatePassword(Employee employee);
+
+
     @Select("select * from employee where id = #{id}")
     Employee selectById(Long id);
+
+    void stopAndStart(Employee employee);
+
+    void updateEmp(Employee employee);
 }

@@ -26,4 +26,10 @@ public interface EmployeeService {
     PageResult<EmployeePageVO> queryPage(EmployeePageQueryDTO employeePageQueryDTO);
 
     void updatePassword(EmployeeEditPswDTO employeeEditPswDTO);
+
+    void stopAndStart(Integer status, Long id);
+
+    Employee selectById(Long id);
+
+    void updateEmp(EmployeeDTO employeeDTO);
 }

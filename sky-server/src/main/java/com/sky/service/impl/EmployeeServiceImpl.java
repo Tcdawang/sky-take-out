@@ -15,6 +15,7 @@ import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
 import com.sky.vo.EmployeePageVO;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,5 +144,30 @@ public class EmployeeServiceImpl implements EmployeeService {
         newEmployee.setUpdateUser(currentId);
         //调用mapper修改密码
         employeeMapper.updatePassword(newEmployee);
+    }
+
+    @Override
+    public void stopAndStart(Integer status, Long id) {
+        log.info("前端传回来的状态值和id值为:{},{}",status,id);
+        Employee employee = new Employee();
+        Long currentId = BaseContext.getCurrentId();
+        employee.setStatus(status);
+        employee.setId(id);
+        employee.setUpdateUser(currentId);
+        employeeMapper.stopAndStart(employee);
+    }
+
+    @Override
+    public Employee selectById(Long id) {
+        return employeeMapper.selectById(id);
+    }
+
+    @Override
+    public void updateEmp(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+        Long currentId = BaseContext.getCurrentId();
+        employee.setUpdateUser(currentId);
+        employeeMapper.updateEmp(employee);
     }
 }

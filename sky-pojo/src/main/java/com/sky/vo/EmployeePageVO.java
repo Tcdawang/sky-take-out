@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 public class EmployeePageVO {
+    private Long id;
     private String name;
     private String username;
     private String phone;
