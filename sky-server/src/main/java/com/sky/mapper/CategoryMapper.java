@@ -30,4 +30,10 @@ public interface CategoryMapper {
      */
 
     void updateCategory(Category category);
+
+    /**
+     * 根据分类进行查询
+     * @param type
+     */
+    List<Category> selectByType(Integer type);
 }

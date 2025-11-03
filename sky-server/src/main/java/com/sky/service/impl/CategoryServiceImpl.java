@@ -17,6 +17,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -73,5 +75,10 @@ public class CategoryServiceImpl implements CategoryService {
         category.setUpdateUser(currentId);
         log.info("修改后的分类：{}", category);
         categoryMapper.updateCategory(category);
+    }
+
+    @Override
+    public List<Category> selectByType(Integer type) {
+        return categoryMapper.selectByType(type);
     }
 }
