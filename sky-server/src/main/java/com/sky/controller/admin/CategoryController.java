@@ -8,9 +8,8 @@ import com.sky.result.Result;
 import com.sky.service.CategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,6 +55,14 @@ public class CategoryController {
     @ApiOperation("启用或者禁用分类")
     public Result startOrStop(@PathVariable("status") Integer status, Long id){
         categoryService.startOrStop(status, id);
+        return Result.success();
+    }
+
+    @DeleteMapping
+    @ApiOperation("删除分类")
+    public Result delete(Long id){
+        log.info("要删除的id为:{}", id);
+        categoryService.delete(id);
         return Result.success();
     }
 }

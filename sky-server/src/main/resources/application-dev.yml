@@ -5,4 +5,12 @@ sky:
     port: 3306
     database: sky_take_out
     username: root
-    password: tc20050729
+    password: 123
+
+  alioss:
+    # application-dev.yml
+    endpoint: your-endpoint
+    access-key-id: your-access-key-id      # 移除实际密钥
+    access-key-secret: your-access-key-secret  # 移除实际密钥
+    bucket-name: your-bucket-name
+

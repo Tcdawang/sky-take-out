@@ -36,4 +36,9 @@ public interface CategoryMapper {
      * @param type
      */
     List<Category> selectByType(Integer type);
+
+    /**
+     * 根据id进行删除
+     */
+    void delete(Long id);
 }

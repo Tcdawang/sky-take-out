@@ -28,6 +28,10 @@
         </set>
         where id =#{id}
     </update>
+    <delete id="delete">
+        delete from category
+        where id = #{id}
+    </delete>
 
     <select id="queryPage" resultType="com.sky.entity.Category">
         select * from category
