@@ -18,7 +18,7 @@
             <if test="sort!=null">
                 sort=#{sort},
             </if>
-            <if test="status!=status">
+            <if test="status!=null">
                 status=#{status},
             </if>
             <if test="updateUser!=null">

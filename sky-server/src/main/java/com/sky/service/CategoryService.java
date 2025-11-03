@@ -17,4 +17,6 @@ public interface CategoryService {
     void updateCategory(CategoryDTO categoryDTO);
 
     List<Category> selectByType(Integer type);
+
+    void startOrStop(Integer status, Long id);
 }

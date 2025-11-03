@@ -51,4 +51,11 @@ public class CategoryController {
         List<Category> categories = categoryService.selectByType(type);
         return Result.success(categories);
     }
+
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用或者禁用分类")
+    public Result startOrStop(@PathVariable("status") Integer status, Long id){
+        categoryService.startOrStop(status, id);
+        return Result.success();
+    }
 }

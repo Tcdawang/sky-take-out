@@ -81,4 +81,14 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Category> selectByType(Integer type) {
         return categoryMapper.selectByType(type);
     }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Category category = new Category();
+        category.setId(id);
+        category.setStatus(status);
+        Long currentId = BaseContext.getCurrentId();
+        category.setUpdateUser(currentId);
+        categoryMapper.updateCategory(category);
+    }
 }
