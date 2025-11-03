@@ -10,6 +10,8 @@ import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.entity.Category;
 import com.sky.exception.CategoryException;
 import com.sky.mapper.CategoryMapper;
+import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,10 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryMapper categoryMapper;
+    @Autowired
+    private DishMapper dishMapper;
+    @Autowired
+    private SetmealMapper setmealMapper;
     @Override
     public PageResult<Category> queryPage(CategoryPageQueryDTO categoryPageQueryDTO) {
         //创建分页查询的对象
@@ -90,5 +96,21 @@ public class CategoryServiceImpl implements CategoryService {
         Long currentId = BaseContext.getCurrentId();
         category.setUpdateUser(currentId);
         categoryMapper.updateCategory(category);
+    }
+
+    @Override
+    public void delete(Long id) {
+        //查询该id下有多少的菜品
+        Integer dishNum = dishMapper.selectByCategoryId(id);
+        if (dishNum > 0){
+            throw new CategoryException(MessageConstant.CATEGORY_BE_RELATED_BY_DISH);
+        }
+        //再查询该id下有多少个套餐
+        Integer setmealNum = setmealMapper.selectByCategoryId(id);
+        if (setmealNum > 0){
+            throw new CategoryException(MessageConstant.CATEGORY_BE_RELATED_BY_SETMEAL);
+        }
+        //如果都没有再删除该分类
+        categoryMapper.delete(id);
     }
 }
