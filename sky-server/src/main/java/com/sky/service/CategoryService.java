@@ -11,4 +11,6 @@ public interface CategoryService {
     void insertCategory(CategoryDTO categoryDTO);
 
     Category selectByName(String name);
+
+    void updateCategory(CategoryDTO categoryDTO);
 }

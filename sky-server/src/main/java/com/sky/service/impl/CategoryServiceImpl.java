@@ -64,4 +64,14 @@ public class CategoryServiceImpl implements CategoryService {
     public Category selectByName(String name) {
         return categoryMapper.selectByName(name);
     }
+
+    @Override
+    public void updateCategory(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        BeanUtils.copyProperties(categoryDTO, category);
+        Long currentId = BaseContext.getCurrentId();
+        category.setUpdateUser(currentId);
+        log.info("修改后的分类：{}", category);
+        categoryMapper.updateCategory(category);
+    }
 }
