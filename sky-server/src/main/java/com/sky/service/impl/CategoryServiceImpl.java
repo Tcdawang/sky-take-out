@@ -31,6 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private SetmealMapper setmealMapper;
     @Override
+    //TODO 在分页查询之前添加条件判断如果此时查询没有带条件值 我们就正常进行分页查询 如果有就将页面重置为1
     public PageResult<Category> queryPage(CategoryPageQueryDTO categoryPageQueryDTO) {
         //创建分页查询的对象
         PageResult<Category> pr = new PageResult<>();
