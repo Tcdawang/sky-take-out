@@ -23,7 +23,7 @@ public class DishController {
 
     @GetMapping("/page")
     @ApiOperation("菜品分页查询")
-    public Result<PageResult<DishVO>> queryPage(DishPageQueryDTO dishPageQueryDTO){
+    public Result<PageResult<DishVO>> queryPage(DishPageQueryDTO dishPageQueryDTO) {
         log.info("分页查询相关数据:{}", dishPageQueryDTO);
         PageResult<DishVO> pr = dishService.queryPage(dishPageQueryDTO);
         return Result.success(pr);
@@ -31,9 +31,26 @@ public class DishController {
 
     @PostMapping
     @ApiOperation("新增菜品")
-    public Result insertDish(@RequestBody DishDTO dishDTO){
-        log.info("新增数据:{}",dishDTO );
+    public Result insertDish(@RequestBody DishDTO dishDTO) {
+        log.info("新增数据:{}", dishDTO);
         dishService.insertDish(dishDTO);
         return Result.success();
+    }
+
+    @PutMapping
+    @ApiOperation("修改菜品")
+    public Result update(@RequestBody DishDTO dishDTO) {
+        //查看要修改的值
+        log.info("新增数据:{}", dishDTO);
+        dishService.update(dishDTO);
+        return Result.success();
+    }
+
+
+    @GetMapping("/{id}")
+    public Result<DishVO> selectById(@PathVariable Long id) {
+        log.info("要查询的id值为:{}",id);
+        DishVO dishvo = dishService.selectById(id);
+        return Result.success(dishvo);
     }
 }

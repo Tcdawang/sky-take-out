@@ -10,4 +10,8 @@ public interface DishService {
     PageResult<DishVO> queryPage(DishPageQueryDTO dishPageQueryDTO);
 
     void insertDish(DishDTO dishDTO);
+
+    void update(DishDTO dishDTO);
+
+    DishVO selectById(Long id);
 }

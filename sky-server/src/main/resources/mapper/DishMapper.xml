@@ -9,6 +9,34 @@
         values (#{name}, #{categoryId}, #{price}, #{image}, #{description},
                 #{status}, now(),now(), #{createUser}, #{updateUser})
     </insert>
+    <update id="update">
+        update dish
+        <set>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="categoryId!=null">
+                category_id=#{categoryId},
+            </if>
+            <if test="price!=null">
+                price=#{price},
+            </if>
+            <if test="image!=null and image!=''">
+                image=#{image},
+            </if>
+            <if test="description!=null and description!=''">
+                description=#{description},
+            </if>
+            <if test="status!=null">
+                status=#{status},
+            </if>
+            update_Time = now(),
+            <if test="updateUser!=null">
+                update_user=#{updateUser},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
 
 
     <select id="selectByCategoryId" resultType="integer">
@@ -33,5 +61,9 @@
             </if>
         </where>
         order by d.create_time desc
+    </select>
+    <select id="selectById" resultType="com.sky.entity.Dish">
+        select * from dish
+        where id=#{id}
     </select>
 </mapper>

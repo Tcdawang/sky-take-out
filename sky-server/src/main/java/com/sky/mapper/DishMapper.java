@@ -14,4 +14,8 @@ public interface DishMapper {
     List<DishVO> queryPage(String name, Integer categoryId, Integer status);
 
     void insertDish(Dish dish);
+
+    Dish selectById(Long id);
+
+    void update(Dish dish);
 }

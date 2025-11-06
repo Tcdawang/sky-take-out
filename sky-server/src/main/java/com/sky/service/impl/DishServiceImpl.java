@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -87,5 +88,43 @@ public class DishServiceImpl implements DishService {
             }
             dishFlavorMapper.insertFlavors(flavors);
         }
+    }
+
+    /**
+     * 修改菜品
+     */
+    @Override
+    @Transactional
+    public void update(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        //修改dish
+        dishMapper.update(dish);
+        //对口味进行修改 思路  先将原来的口味表中数据删除 然后添加新的数据
+        dishFlavorMapper.deleteByDishId(dishDTO.getId());
+
+
+        //删除后将新的数据添加进去
+        List<DishFlavor> newDishFlavors = dishDTO.getFlavors();
+
+        if(newDishFlavors != null && newDishFlavors.size() > 0){
+            for (DishFlavor newDishFlavor : newDishFlavors) {
+                newDishFlavor.setDishId(dishDTO.getId());
+            }
+            dishFlavorMapper.insertFlavors(newDishFlavors);
+        }
+
+    }
+
+    @Override
+    public DishVO selectById(Long id) {
+        //根据id查询出菜品的值
+        Dish dish = dishMapper.selectById(id);
+        //再根据dishId的值查询出来菜品口味的值
+        List<DishFlavor> dishFlavors = dishFlavorMapper.selectByDishId(id);
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish, dishVO);
+        dishVO.setFlavors(dishFlavors);
+        return dishVO;
     }
 }
