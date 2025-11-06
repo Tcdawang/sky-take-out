@@ -6,6 +6,8 @@ import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.vo.DishVO;
 
+import java.util.List;
+
 public interface DishService {
     PageResult<DishVO> queryPage(DishPageQueryDTO dishPageQueryDTO);
 
@@ -14,4 +16,6 @@ public interface DishService {
     void update(DishDTO dishDTO);
 
     DishVO selectById(Long id);
+
+    void delete(List<Long> ids);
 }

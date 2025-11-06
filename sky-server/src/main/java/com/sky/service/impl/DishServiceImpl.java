@@ -2,13 +2,17 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -29,6 +33,8 @@ public class DishServiceImpl implements DishService {
     private DishMapper dishMapper;
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
 
     @Override
     /**
@@ -45,7 +51,7 @@ public class DishServiceImpl implements DishService {
         PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
 
         //调用mapper
-        Page<DishVO> dishes = (Page<DishVO>)dishMapper.queryPage(dishPageQueryDTO.getName(), dishPageQueryDTO.getCategoryId(),
+        Page<DishVO> dishes = (Page<DishVO>) dishMapper.queryPage(dishPageQueryDTO.getName(), dishPageQueryDTO.getCategoryId(),
                 dishPageQueryDTO.getStatus());
         log.info("查询出来的结果:{}", dishes);
         pr.setTotal(dishes.getTotal());
@@ -55,6 +61,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 对应添加菜品 在表单项中有口味的选择 因此这里会操作两种表 因此我们需要通过事务来保证数据的原子性
+     *
      * @param dishDTO
      */
     @Override
@@ -80,7 +87,7 @@ public class DishServiceImpl implements DishService {
         //添加完后为口味表中添加n条数据 n = 0~n 因为前端的口味的表单项可以不写
         List<DishFlavor> flavors = dishDTO.getFlavors();
         log.info("菜品风味:{}", flavors);
-        if(flavors != null && flavors.size() > 0){
+        if (flavors != null && flavors.size() > 0) {
             //因为此时还没有执行添加dishflavor的语句 说以此时还没有dishId值 可以通关dish表的添加语句通过逐主键回显来获取id
             for (DishFlavor flavor : flavors) {
                 //为每一个菜品的flavor添加dishId
@@ -107,7 +114,7 @@ public class DishServiceImpl implements DishService {
         //删除后将新的数据添加进去
         List<DishFlavor> newDishFlavors = dishDTO.getFlavors();
 
-        if(newDishFlavors != null && newDishFlavors.size() > 0){
+        if (newDishFlavors != null && newDishFlavors.size() > 0) {
             for (DishFlavor newDishFlavor : newDishFlavors) {
                 newDishFlavor.setDishId(dishDTO.getId());
             }
@@ -126,5 +133,26 @@ public class DishServiceImpl implements DishService {
         BeanUtils.copyProperties(dish, dishVO);
         dishVO.setFlavors(dishFlavors);
         return dishVO;
+    }
+
+    @Override
+    @Transactional
+    public void delete(List<Long> ids) {
+        for (Long id : ids) {
+            //判断商品是否是启售中 如果是则无法删除
+            Dish dish = dishMapper.selectById(id);
+            if (dish.getStatus() == StatusConstant.ENABLE) {
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+        //判断菜品是否与套餐关联
+        List<Long> id = setmealDishMapper.selectByDishIds(ids);
+        if (id != null &&  id.size() > 0){
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+        //批量删除菜品
+        dishMapper.delete(ids);
+        //批量删除口味
+        dishFlavorMapper.deleteByDishIds(ids);
     }
 }

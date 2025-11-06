@@ -18,4 +18,6 @@ public interface DishMapper {
     Dish selectById(Long id);
 
     void update(Dish dish);
+
+    void delete(List<Long> ids);
 }
