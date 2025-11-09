@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.SetmealMapper">
+    <insert id="insertSetmeal" useGeneratedKeys="true" keyProperty="id">
+        insert into setmeal(category_id, name, price, status, description,
+                            image, create_time, update_time, create_user, update_user)
+        values (#{categoryId}, #{name}, #{price},
+                #{status}, #{description}, #{image}, now(), now(), #{createUser}, #{updateUser})
+    </insert>
     <select id="selectByCategoryId" resultType="java.lang.Integer">
-        select count(*) from setmeal
-        where category_id=#{categoryId}
+        select count(*)
+        from setmeal
+        where category_id = #{categoryId}
+    </select>
+    <select id="queryPage" resultType="com.sky.vo.SetmealVO">
+        select s.*, c.name as categoryName
+        from setmeal s
+                 left join category c on s.category_id = c.id
     </select>
 </mapper>

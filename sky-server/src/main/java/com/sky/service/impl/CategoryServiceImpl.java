@@ -8,6 +8,7 @@ import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.entity.Category;
+import com.sky.entity.Dish;
 import com.sky.exception.CategoryException;
 import com.sky.mapper.CategoryMapper;
 import com.sky.mapper.DishMapper;

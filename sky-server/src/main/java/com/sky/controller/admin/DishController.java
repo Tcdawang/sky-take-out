@@ -3,6 +3,7 @@ package com.sky.controller.admin;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 
+import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -50,15 +51,32 @@ public class DishController {
 
 
     @GetMapping("/{id}")
+    @ApiOperation("根据id查询菜品")
     public Result<DishVO> selectById(@PathVariable Long id) {
         log.info("要查询的id值为:{}",id);
         DishVO dishvo = dishService.selectById(id);
         return Result.success(dishvo);
     }
+
+    @GetMapping("/list")
+    @ApiOperation("根据分类id查询菜品")
+    public Result<List<Dish>> list(Long categoryId,String name) {
+        log.info("要查询的分类id值为:{}",categoryId);
+        List<Dish> dishes = dishService.list(categoryId,name);
+        return Result.success(dishes);
+    }
+
     @DeleteMapping
+    @ApiOperation("删除菜品")
     public Result delete(@RequestParam List<Long> ids){
         log.info("查看id:{}", ids);
         dishService.delete(ids);
+        return Result.success();
+    }
+    @PostMapping("/status/{status}")
+    public Result startAndStop(@PathVariable Integer status, Long id){
+        log.info("要启用或禁用的菜品id:{}", id);
+        dishService.startAndStop(status,id);
         return Result.success();
     }
 }

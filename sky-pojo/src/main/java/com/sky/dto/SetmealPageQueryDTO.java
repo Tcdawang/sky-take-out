@@ -11,6 +11,7 @@ public class SetmealPageQueryDTO implements Serializable {
 
     private int pageSize;
 
+
     private String name;
 
     //分类id

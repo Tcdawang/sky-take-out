@@ -16,13 +16,13 @@ import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -130,7 +130,7 @@ public class DishServiceImpl implements DishService {
         //再根据dishId的值查询出来菜品口味的值
         List<DishFlavor> dishFlavors = dishFlavorMapper.selectByDishId(id);
         DishVO dishVO = new DishVO();
-        BeanUtils.copyProperties(dish, dishVO);
+        BeanUtils.copyProperties(dish,   dishVO);
         dishVO.setFlavors(dishFlavors);
         return dishVO;
     }
@@ -154,5 +154,26 @@ public class DishServiceImpl implements DishService {
         dishMapper.delete(ids);
         //批量删除口味
         dishFlavorMapper.deleteByDishIds(ids);
+    }
+
+    @Override
+    public void startAndStop(Integer status, Long id) {
+        Dish dish = new Dish();
+        Long currentId = BaseContext.getCurrentId();
+        dish.setStatus(status);
+        dish.setId(id);
+        dish.setUpdateUser(currentId);
+        dishMapper.update(dish);
+    }
+
+
+    @Override
+    public List<Dish> list(Long categoryId, String name) {
+        Dish dish = Dish.builder()
+                .categoryId(categoryId)
+                .name(name)
+                .status(StatusConstant.ENABLE)
+                .build();
+        return dishMapper.list(dish);
     }
 }

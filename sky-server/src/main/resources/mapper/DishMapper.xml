@@ -37,6 +37,7 @@
         </set>
         where id = #{id}
     </update>
+
     <delete id="delete">
         delete from dish where id in
         <foreach collection="ids" separator="," open="(" close=")" item="id">
@@ -45,11 +46,6 @@
     </delete>
 
 
-    <select id="selectByCategoryId" resultType="integer">
-        select count(*)
-        from dish
-        where category_id = #{id}
-    </select>
     <select id="queryPage" resultType="com.sky.vo.DishVO">
         select d.* ,c.name as categoryName
         from dish d left join category c on d.category_id = c.id
@@ -72,5 +68,26 @@
         select *
         from dish
         where id = #{id}
+    </select>
+    <select id="selectByCategoryId" resultType="integer">
+        select count(*) from dish
+        where category_id=#{categoryId}
+    </select>
+
+
+    <select id="list" resultType="com.sky.entity.Dish">
+        select * from dish
+        <where>
+            <if test="name != null">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        order by create_time desc
     </select>
 </mapper>
