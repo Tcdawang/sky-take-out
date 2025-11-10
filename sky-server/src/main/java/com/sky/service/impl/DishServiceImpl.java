@@ -130,7 +130,7 @@ public class DishServiceImpl implements DishService {
         //再根据dishId的值查询出来菜品口味的值
         List<DishFlavor> dishFlavors = dishFlavorMapper.selectByDishId(id);
         DishVO dishVO = new DishVO();
-        BeanUtils.copyProperties(dish,   dishVO);
+        BeanUtils.copyProperties(dish,dishVO);
         dishVO.setFlavors(dishFlavors);
         return dishVO;
     }

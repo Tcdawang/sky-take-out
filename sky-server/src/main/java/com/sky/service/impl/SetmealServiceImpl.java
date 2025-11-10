@@ -70,4 +70,16 @@ public class SetmealServiceImpl implements SetmealService {
         //批量添加菜品和套餐关系
         setmealDishMapper.insertSetmealDish(setmealDishes);
     }
+
+    @Override
+    public SetmealVO selectById(Long id) {
+        //先根据id查询出来套餐情况
+        Setmeal setmeal = setmealMapper.selectById(id);
+        SetmealVO sv = new SetmealVO();
+        BeanUtils.copyProperties(setmeal, sv);
+        //再根据setmealId查询出来套餐中包含的菜品
+        List<SetmealDish> setmealDishes = setmealDishMapper.selectBySetmealId(id);
+        sv.setSetmealDishes(setmealDishes);
+        return sv;
+    }
 }

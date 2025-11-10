@@ -14,4 +14,6 @@ public interface SetmealMapper {
     List<SetmealVO> queryPage(String name, Integer categoryId, Integer status);
 
     void insertSetmeal(Setmeal setmeal);
+
+    Setmeal selectById(Long id);
 }

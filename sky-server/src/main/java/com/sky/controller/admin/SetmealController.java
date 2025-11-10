@@ -27,9 +27,18 @@ public class SetmealController {
     }
 
     @PostMapping
+    @ApiOperation("添加套餐")
     public Result insertSetmeal(@RequestBody SetmealDTO setmealDTO){
         log.info("要添加的套餐为:{}", setmealDTO);
         setmealService.insertSetmeal(setmealDTO);
         return Result.success();
     }
+
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询套餐")
+    public Result<SetmealVO> selectById(@PathVariable Long id){
+        SetmealVO sv = setmealService.selectById(id);
+        return Result.success(sv);
+    }
+
 }

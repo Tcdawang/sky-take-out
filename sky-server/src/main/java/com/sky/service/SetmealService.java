@@ -10,4 +10,6 @@ public interface SetmealService {
    PageResult<SetmealVO> queryPage(SetmealPageQueryDTO setmealPageQueryDTO);
 
    void insertSetmeal(SetmealDTO setmealDTO);
+
+   SetmealVO selectById(Long id);
 }

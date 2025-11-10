@@ -7,4 +7,4 @@ import java.io.Serializable;
 public class DishStatus implements Serializable {
     private Long id;
     private Integer status;
-}
+}   
