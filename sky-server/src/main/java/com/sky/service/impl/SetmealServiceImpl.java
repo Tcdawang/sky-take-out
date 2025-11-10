@@ -14,6 +14,7 @@ import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
 import com.sky.vo.SetmealVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,8 +65,10 @@ public class SetmealServiceImpl implements SetmealService {
         List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
         log.info("套餐中菜品信息:{}", setmealDishes);
         //由于此时还没有在setmealDish的表中添加数据因此我们是无法获取到套餐的id的我们可以遍历集合将回显回来的id赋值
-        for (SetmealDish setmealDish : setmealDishes) {
-            setmealDish.setSetmealId(id);
+        if (setmealDishes!=null && setmealDishes.size()>0){
+            for (SetmealDish setmealDish : setmealDishes) {
+                setmealDish.setSetmealId(id);
+            }
         }
         //批量添加菜品和套餐关系
         setmealDishMapper.insertSetmealDish(setmealDishes);
@@ -81,5 +84,26 @@ public class SetmealServiceImpl implements SetmealService {
         List<SetmealDish> setmealDishes = setmealDishMapper.selectBySetmealId(id);
         sv.setSetmealDishes(setmealDishes);
         return sv;
+    }
+
+    @Override
+    @Transactional
+    public void update(SetmealDTO setmealDTO) {
+        //修改套餐
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+        setmealMapper.update(setmeal);
+        //获取套餐id
+        Long setmealId = setmealDTO.getId();
+        //删除套餐中原有的菜品 如果有
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        setmealDishMapper.deleteBySetmealId(setmealId);
+        //在向套餐菜品关系表添加新增的菜品
+        if (setmealDishes != null && setmealDishes.size() >0){
+            for (SetmealDish setmealDish : setmealDishes) {
+                setmealDish.setSetmealId(setmealId);
+            }
+        }
+        setmealDishMapper.insertSetmealDish(setmealDishes);
     }
 }

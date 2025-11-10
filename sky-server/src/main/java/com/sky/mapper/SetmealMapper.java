@@ -16,4 +16,6 @@ public interface SetmealMapper {
     void insertSetmeal(Setmeal setmeal);
 
     Setmeal selectById(Long id);
+
+    void update(Setmeal setmeal);
 }
