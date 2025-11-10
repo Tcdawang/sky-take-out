@@ -18,4 +18,8 @@ public interface SetmealMapper {
     Setmeal selectById(Long id);
 
     void update(Setmeal setmeal);
+
+    List<Integer> selectStatusByIds(List<Long> ids);
+
+    void deleteByIds(List<Long> ids);
 }

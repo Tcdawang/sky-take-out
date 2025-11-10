@@ -2,12 +2,14 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
@@ -105,5 +107,33 @@ public class SetmealServiceImpl implements SetmealService {
             }
         }
         setmealDishMapper.insertSetmealDish(setmealDishes);
+    }
+
+    @Override
+    @Transactional
+    public void delete(List<Long> ids) {
+        //如果套餐是起售状态则不可删除
+        List<Integer> status = setmealMapper.selectStatusByIds(ids);
+        for (Integer statu : status) {
+            if (statu == StatusConstant.DISABLE){
+                throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+            }
+        }
+        //删除套餐表中的数据
+        setmealMapper.deleteByIds(ids);
+        //删除套餐菜品关系表中的数据
+        for (Long id : ids) {
+            setmealDishMapper.deleteBySetmealId(id);
+        }
+    }
+
+    @Override
+    public void startAndStop(Integer status, Long id) {
+        Setmeal setmeal = new Setmeal();
+        setmeal.setStatus(status);
+        setmeal.setId(id);
+        Long currentId = BaseContext.getCurrentId();
+        setmeal.setUpdateUser(currentId);
+        setmealMapper.update(setmeal);
     }
 }
