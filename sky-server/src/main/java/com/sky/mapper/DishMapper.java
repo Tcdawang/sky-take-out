@@ -23,4 +23,6 @@ public interface DishMapper {
     void delete(List<Long> ids);
 
     List<Dish> list(Dish dish);
+
+    List<Dish> getDishByCategoryId(Long categoryId);
 }

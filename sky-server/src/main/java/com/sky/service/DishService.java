@@ -23,4 +23,5 @@ public interface DishService {
 
     List<Dish> list (Long categoryId, String name);
 
+    List<DishVO> getDishByCategoryId(Long categoryId);
 }

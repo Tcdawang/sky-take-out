@@ -52,6 +52,10 @@
     </select>
     <select id="selectByType" resultType="category">
         select * from category
-        where type=#{type}
+        <where>
+            <if test="type != null">
+                type=#{type}
+            </if>
+        </where>
     </select>
 </mapper>
