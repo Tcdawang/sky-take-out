@@ -185,11 +185,16 @@ public class DishServiceImpl implements DishService {
         List<DishVO> dishVOS = new ArrayList<>();
         //根据dishid查出菜品口味
         for (Dish dish : dishes) {
-            List<DishFlavor> dishFlavors = dishFlavorMapper.selectByDishId(dish.getId());
-            DishVO dishVO = new DishVO();
-            BeanUtils.copyProperties(dish, dishVO);
-            dishVO.setFlavors(dishFlavors);
-            dishVOS.add(dishVO);
+            //判断此时的菜品是否在售中 如果在就显示在小程序端
+            if (dish.getStatus() == StatusConstant.ENABLE){
+                List<DishFlavor> dishFlavors = dishFlavorMapper.selectByDishId(dish.getId());
+                DishVO dishVO = new DishVO();
+                BeanUtils.copyProperties(dish, dishVO);
+                dishVO.setFlavors(dishFlavors);
+                dishVOS.add(dishVO);
+            }else {
+                continue;
+            }
         }
         return dishVOS;
     }

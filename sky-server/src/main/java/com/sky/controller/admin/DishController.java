@@ -12,9 +12,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -23,6 +25,8 @@ import java.util.List;
 public class DishController {
     @Autowired
     private DishService dishService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @GetMapping("/page")
     @ApiOperation("菜品分页查询")
@@ -37,6 +41,8 @@ public class DishController {
     public Result insertDish(@RequestBody DishDTO dishDTO) {
         log.info("新增数据:{}", dishDTO);
         dishService.insertDish(dishDTO);
+        String key = "dish_" + dishDTO.getCategoryId();
+        cleanCache(key);
         return Result.success();
     }
 
@@ -44,8 +50,9 @@ public class DishController {
     @ApiOperation("修改菜品")
     public Result update(@RequestBody DishDTO dishDTO) {
         //查看要修改的值
-        log.info("新增数据:{}", dishDTO);
+        log.info("新增数据:{}", dishDTO.toString());
         dishService.update(dishDTO);
+        cleanCache("dish_*");
         return Result.success();
     }
 
@@ -71,12 +78,23 @@ public class DishController {
     public Result delete(@RequestParam List<Long> ids){
         log.info("查看id:{}", ids);
         dishService.delete(ids);
+        cleanCache("dish_*");
         return Result.success();
     }
     @PostMapping("/status/{status}")
     public Result startAndStop(@PathVariable Integer status, Long id){
         log.info("要启用或禁用的菜品id:{}", id);
         dishService.startAndStop(status,id);
+        cleanCache("dish_*");
         return Result.success();
+    }
+    /**
+     * 用于清理缓存数据方法
+     */
+    private void cleanCache(String pattern){
+        //根据通配符去查询key
+        Set keys = redisTemplate.keys(pattern);
+        //再根据查询出来的keys去删除缓存
+        redisTemplate.delete(keys);
     }
 }
