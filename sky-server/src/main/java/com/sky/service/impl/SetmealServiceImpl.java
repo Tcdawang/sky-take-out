@@ -7,13 +7,16 @@ import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Update;
@@ -22,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,6 +35,9 @@ public class SetmealServiceImpl implements SetmealService {
     private SetmealMapper setmealMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private DishMapper dishMapper;
+
     @Override
     public PageResult<SetmealVO> queryPage(SetmealPageQueryDTO setmealPageQueryDTO) {
         log.info("分页查询参数:{}", setmealPageQueryDTO);
@@ -135,5 +142,27 @@ public class SetmealServiceImpl implements SetmealService {
         Long currentId = BaseContext.getCurrentId();
         setmeal.setUpdateUser(currentId);
         setmealMapper.update(setmeal);
+    }
+
+    @Override
+    public List<Setmeal> getSetmealByCategoryId(Long categoryId) {
+        return setmealMapper.getSetmealByCategoryId(categoryId);
+    }
+
+    @Override
+    public List<DishItemVO> getDishBySetmealId(Long id) {
+        List<DishItemVO> dishItemVOS = new ArrayList<>();
+        //根据id查询出套餐和菜品的关系
+        List<SetmealDish> setmealDishes = setmealDishMapper.selectBySetmealId(id);
+        //再根据菜品id查询出来菜品
+        for (SetmealDish setmealDish : setmealDishes) {
+            Dish dish = dishMapper.selectById(setmealDish.getDishId());
+            DishItemVO dishItemVO = new DishItemVO();
+            BeanUtils.copyProperties(setmealDish, dishItemVO);
+            dishItemVO.setImage(dish.getImage());
+            dishItemVO.setDescription(dish.getDescription());
+            dishItemVOS.add(dishItemVO);
+        }
+        return dishItemVOS;
     }
 }

@@ -2,8 +2,10 @@ package com.sky.service;
 
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Setmeal;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 
 import java.util.List;
@@ -20,4 +22,8 @@ public interface SetmealService {
     void delete(List<Long> ids);
 
     void startAndStop(Integer status, Long id);
+
+    List<Setmeal> getSetmealByCategoryId(Long categoryId);
+
+    List<DishItemVO> getDishBySetmealId(Long id);
 }

@@ -22,4 +22,6 @@ public interface SetmealMapper {
     List<Integer> selectStatusByIds(List<Long> ids);
 
     void deleteByIds(List<Long> ids);
+
+    List<Setmeal> getSetmealByCategoryId(Long categoryId);
 }
