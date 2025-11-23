@@ -9,4 +9,8 @@ public interface ShoppingCartService {
     void insertShoppingCard(ShoppingCartDTO shoppingCartDTO);
 
     List<ShoppingCart> list();
+
+    void deleteOne(ShoppingCartDTO shoppingCartDTO);
+
+    void deleteAll();
 }
