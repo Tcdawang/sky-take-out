@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,8 @@ public class SetmealController {
     private SetmealService setmealService;
     @GetMapping("/list")
     @ApiOperation("根据分类id显示套餐")
+    //通过Cacheable这个注解可以查询缓存中是否有我们这个分类id的套餐如果有就直接从缓存中读数据 没有就执行sql再将数据存储到缓存
+    @Cacheable(cacheNames = "setmeal", key="#categoryId")
     public Result<List<Setmeal>> getSetmealByCategoryId(Long categoryId){
         List<Setmeal> setmeals = setmealService.getSetmealByCategoryId(categoryId);
         return Result.success(setmeals);

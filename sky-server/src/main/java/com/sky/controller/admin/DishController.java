@@ -24,7 +24,7 @@ import java.util.Set;
 @Api(tags = "菜品管理")
 public class DishController {
     @Autowired
-    private DishService dishService;
+    private DishService dishService;     
     @Autowired
     private RedisTemplate redisTemplate;
 

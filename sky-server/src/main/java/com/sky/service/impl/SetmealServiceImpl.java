@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +57,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     @Transactional
-
+    @CacheEvict(cacheNames = "setmeal", key = "#setmealDTO.categoryId")
     public void insertSetmeal(SetmealDTO setmealDTO) {
         //添加套餐数据
         Setmeal setmeal = new Setmeal();
@@ -97,6 +98,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "setmeal", allEntries = true)
     public void update(SetmealDTO setmealDTO) {
         //修改套餐
         Setmeal setmeal = new Setmeal();
@@ -118,6 +120,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "setmeal", allEntries = true)
     public void delete(List<Long> ids) {
         //如果套餐是起售状态则不可删除
         List<Integer> status = setmealMapper.selectStatusByIds(ids);
@@ -135,6 +138,7 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "setmeal", allEntries = true)
     public void startAndStop(Integer status, Long id) {
         Setmeal setmeal = new Setmeal();
         setmeal.setStatus(status);
@@ -153,6 +157,7 @@ public class SetmealServiceImpl implements SetmealService {
     public List<DishItemVO> getDishBySetmealId(Long id) {
         List<DishItemVO> dishItemVOS = new ArrayList<>();
         //根据id查询出套餐和菜品的关系
+
         List<SetmealDish> setmealDishes = setmealDishMapper.selectBySetmealId(id);
         //再根据菜品id查询出来菜品
         for (SetmealDish setmealDish : setmealDishes) {
