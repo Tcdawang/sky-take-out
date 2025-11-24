@@ -9,13 +9,13 @@ public interface AddressBookService {
 
     void insertAddressBook(AddressBook addressBook);
 
-    void updateDefalut(Integer id);
+    void updateDefalut(Long id);
 
     AddressBook getDefault();
 
-    AddressBook getAddressById(Integer id);
+    AddressBook getAddressById(Long id);
 
     void updateById(AddressBook addressBook);
 
-    void deleteById(Integer id);
+    void deleteById(Long id);
 }

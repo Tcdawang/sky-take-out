@@ -11,11 +11,11 @@ public interface AddressBookMapper {
 
     void insertAddressBook(AddressBook addressBook);
 
-    AddressBook getAdressById(Integer id);
+    AddressBook getAdressById(Long id);
 
     void update(AddressBook adressBook);
 
     AddressBook getDefault(Integer isDefault);
 
-    void deleteById(Integer id);
+    void deleteById(Long id);
 }

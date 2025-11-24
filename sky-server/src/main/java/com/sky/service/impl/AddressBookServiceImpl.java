@@ -30,7 +30,7 @@ public class AddressBookServiceImpl implements AddressBookService {
     }
 
     @Override
-    public void updateDefalut(Integer id) {
+    public void updateDefalut(Long id) {
         //先查询出当前有没有默认地址
         AddressBook defaultAddress = addressBookMapper.getDefault(IsDefaultConstant.DEFAULT_YES);
         if (defaultAddress != null){
@@ -52,7 +52,7 @@ public class AddressBookServiceImpl implements AddressBookService {
     }
 
     @Override
-    public AddressBook getAddressById(Integer id) {
+    public AddressBook getAddressById(Long id) {
         return addressBookMapper.getAdressById(id);
     }
 
@@ -62,7 +62,7 @@ public class AddressBookServiceImpl implements AddressBookService {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public void deleteById(Long id) {
         addressBookMapper.deleteById(id);
     }
 }

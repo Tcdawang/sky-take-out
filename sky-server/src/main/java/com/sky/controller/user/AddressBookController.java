@@ -5,10 +5,7 @@ import com.sky.result.Result;
 import com.sky.service.AddressBookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,8 +36,8 @@ public class AddressBookController {
 
     @PutMapping("/default")
     @ApiOperation("设置默认的地址")
-    public Result updateDefault(@RequestBody Map<String, Integer> map){
-        Integer id = map.get("id");
+    public Result updateDefault(@RequestBody Map<String, Long> map){
+        Long id = map.get("id");
         log.info("要修改的id为:{}", id);
         addressBookService.updateDefalut(id);
         return Result.success();
@@ -55,7 +52,7 @@ public class AddressBookController {
 
     @GetMapping("/{id}")
     @ApiOperation("根据id查询地址")
-    public Result<AddressBook> getAddressById(@PathVariable Integer id){
+    public Result<AddressBook> getAddressById(@PathVariable Long id){
         AddressBook addressBook = addressBookService.getAddressById(id);
         return Result.success(addressBook);
     }
@@ -69,7 +66,7 @@ public class AddressBookController {
 
     @DeleteMapping
     @ApiOperation("根据id删除地址")
-    public Result deleteById(Integer id){
+    public Result deleteById(Long id){
         log.info("要删除的地址id为:{}", id);
         addressBookService.deleteById(id);
         return Result.success();
