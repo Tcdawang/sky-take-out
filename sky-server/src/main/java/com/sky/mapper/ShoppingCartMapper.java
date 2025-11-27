@@ -16,4 +16,6 @@ public interface ShoppingCartMapper {
     void deleteOne(ShoppingCart deleteShoppingCart);
 
     void delete(ShoppingCart deleteShoppingCart);
+
+    void insertBatch(List<ShoppingCart> shoppingCartList);
 }

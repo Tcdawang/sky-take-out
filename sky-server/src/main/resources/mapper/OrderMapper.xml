@@ -22,9 +22,33 @@
             checkout_time=#{checkoutTime}
         where id = #{id}
     </update>
+    <update id="update">
+        update orders
+        set pay_status=#{payStatus},
+            status=#{status},
+            cancel_reason=#{cancelReason},
+            cancel_time=#{cancelTime}
+        where id = #{id}
+    </update>
     <select id="getOrderByNumber" resultType="com.sky.entity.Orders">
         select *
         from orders
         where number = #{number}
+    </select>
+    <select id="getOrderById" resultType="com.sky.entity.Orders">
+        select *
+        from orders
+        where id = #{id}
+    </select>
+    <select id="queryPage" resultType="com.sky.entity.Orders">
+        select * from orders
+        <where>
+            <if test="status != null">
+                status=#{status}
+            </if>
+            <if test="userId != null">
+                and user_id=#{userId}
+            </if>
+        </where>
     </select>
 </mapper>
