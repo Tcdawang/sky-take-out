@@ -1,7 +1,9 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.AddressBook;
 import com.sky.entity.OrderDetail;
@@ -14,6 +16,7 @@ import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingCartMapper;
 import com.sky.service.OrderService;
 import com.sky.service.ShoppingCartService;
+import com.sky.vo.OrderPaymentOtherVO;
 import com.sky.vo.OrderSubmitVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -96,5 +99,36 @@ public class OrderServiceImpl implements OrderService {
                 orders.getAmount(), orders.getOrderTime());
         log.info("订单时间为:{}", orders.getOrderTime());
         return orderSubmitVO;
+    }
+
+    @Override
+    /**
+     * 订单支付
+     */
+    public OrderPaymentOtherVO orderPay(OrdersPaymentDTO ordersPaymentDTO) {
+        //生成一个空的json对象
+        JSONObject jsonObject = new JSONObject();
+        if (jsonObject.getString("code")!=null && jsonObject.getString("code").equals("ORDERPAID")){
+            throw new OrderBusinessException("该订单已支付");
+        }
+
+        OrderPaymentOtherVO vo = jsonObject.toJavaObject(OrderPaymentOtherVO.class);
+        return vo;
+    }
+
+    @Override
+    /**
+     * 模拟支付这个的状况
+     */
+    public void paySuccess(String orderNumber) {
+        //根据订单号查询 订单
+        Orders orders = orderMapper.getOrderByNumber(orderNumber);
+
+        //根据订单id更新订单的状态、支付方式、支付状态、结账时间
+        orders.setStatus(Orders.TO_BE_CONFIRMED);
+        orders.setPayStatus(Orders.PAID);
+        orders.setCheckoutTime(LocalDateTime.now());
+
+        orderMapper.paySuccess(orders);
     }
 }

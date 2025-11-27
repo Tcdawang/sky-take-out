@@ -15,4 +15,16 @@
                 #{deliveryStatus}, #{packAmount}, #{tablewareNumber},
                 #{tablewareStatus})
     </insert>
+    <update id="paySuccess">
+        update orders
+        set status=#{status},
+            pay_status=#{payStatus},
+            checkout_time=#{checkoutTime}
+        where id = #{id}
+    </update>
+    <select id="getOrderByNumber" resultType="com.sky.entity.Orders">
+        select *
+        from orders
+        where number = #{number}
+    </select>
 </mapper>
