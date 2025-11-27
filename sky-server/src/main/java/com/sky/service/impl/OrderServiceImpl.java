@@ -5,6 +5,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.AddressBook;
@@ -18,8 +19,8 @@ import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingCartMapper;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
-import com.sky.service.ShoppingCartService;
 import com.sky.vo.OrderPaymentOtherVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
@@ -152,14 +153,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public PageResult<OrderVO> queryPage(Integer page, Integer pageSize, Integer status) {
+    public PageResult<OrderVO> queryPage(OrdersPageQueryDTO ordersPageQueryDTO) {
         PageResult<OrderVO> pr = new PageResult<>();
         //开启分页查询
-        PageHelper.startPage(page, pageSize);
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
 
         //调用mapper获取查询结果
-        Long userId = BaseContext.getCurrentId();
-        Page<Orders> orders = (Page<Orders>)orderMapper.queryPage(status, userId);
+        Page<Orders> orders = (Page<Orders>)orderMapper.queryPage(ordersPageQueryDTO);
         Page<OrderVO> orderVOS = new Page<>();
         for (Orders order : orders) {
             List<OrderDetail> detailByOrderId = orderDetailMapper.getDetailByOrderId(order.getId());
@@ -229,5 +229,20 @@ public class OrderServiceImpl implements OrderService {
         orders.setCancelReason("用户取消");
         orders.setCancelTime(LocalDateTime.now());
         orderMapper.update(orders);
+    }
+
+    @Override
+    public OrderStatisticsVO countOrder() {
+        // 根据状态，分别查询出待接单、待派送、派送中的订单数量
+        Integer toBeConfirmed = orderMapper.countStatus(Orders.TO_BE_CONFIRMED);
+        Integer confirmed = orderMapper.countStatus(Orders.CONFIRMED);
+        Integer deliveryInProgress = orderMapper.countStatus(Orders.DELIVERY_IN_PROGRESS);
+
+        OrderStatisticsVO vo = new OrderStatisticsVO();
+        vo.setToBeConfirmed(toBeConfirmed);
+        vo.setConfirmed(confirmed);
+        vo.setDeliveryInProgress(deliveryInProgress);
+
+        return vo;
     }
 }

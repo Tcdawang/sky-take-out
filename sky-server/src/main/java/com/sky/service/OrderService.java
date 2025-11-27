@@ -1,9 +1,11 @@
 package com.sky.service;
 
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.result.PageResult;
 import com.sky.vo.OrderPaymentOtherVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 
@@ -16,9 +18,13 @@ public interface OrderService {
 
     OrderVO getOrderDetail(Long id);
 
-    PageResult<OrderVO> queryPage(Integer page, Integer pageSize, Integer status);
+    PageResult<OrderVO> queryPage(OrdersPageQueryDTO ordersPageQueryDTO);
 
     void repetition(Long id);
 
     void cancelOrder(Long id);
+
+    OrderStatisticsVO countOrder();
+
+
 }

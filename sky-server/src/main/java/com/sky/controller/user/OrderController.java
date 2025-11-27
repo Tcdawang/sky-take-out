@@ -1,5 +1,7 @@
 package com.sky.controller.user;
 
+import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.Orders;
@@ -15,14 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController("userOrderController")
 @RequestMapping("/user/order")
 @Api(tags = "订单管理")
 @Slf4j
 public class OrderController {
     @Autowired
     private OrderService orderService;
-
     @PostMapping("/submit")
     @ApiOperation("用户下单")
     public Result<OrderSubmitVO> sumbitOrder(@RequestBody OrdersSubmitDTO ordersSubmitDTO){
@@ -54,8 +55,9 @@ public class OrderController {
 
     @GetMapping("/historyOrders")
     @ApiOperation("查询历史订单")
-    public Result<PageResult<OrderVO>> queryPage(Integer page, Integer pageSize, Integer status){
-        PageResult<OrderVO> pageResult = orderService.queryPage(page, pageSize, status);
+    public Result<PageResult<OrderVO>> queryPage( OrdersPageQueryDTO queryDTO){
+        queryDTO.setUserId(BaseContext.getCurrentId());
+        PageResult<OrderVO> pageResult = orderService.queryPage(queryDTO);
         return Result.success(pageResult);
     }
 

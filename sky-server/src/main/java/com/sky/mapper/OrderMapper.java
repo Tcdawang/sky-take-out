@@ -1,5 +1,6 @@
 package com.sky.mapper;
 
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -15,7 +16,9 @@ public interface OrderMapper {
 
     Orders getOrderById(Long id);
 
-    List<Orders> queryPage(Integer status, Long userId);
+    List<Orders> queryPage(OrdersPageQueryDTO ordersPageQueryDTO);
 
     void update(Orders orders);
+
+    Integer countStatus(Integer status);
 }
