@@ -1,7 +1,9 @@
 package com.sky.controller.admin;
 
+import com.sky.dto.OrdersCancelDTO;
+import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.mapper.OrderMapper;
+import com.sky.dto.OrdersRejectionDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
@@ -28,7 +30,7 @@ public class OrderController {
         OrderVO orderVO = orderService.getOrderDetail(id);
         return Result.success(orderVO);
     }
-
+    
 
     @GetMapping("/conditionSearch")
     @ApiOperation("查询历史订单")
@@ -38,10 +40,11 @@ public class OrderController {
     }
 
 
-    @PutMapping("/cancel/{id}")
-    public Result cancelOrder(@PathVariable Long id){
-        log.info("要取消的订单id为:{}", id);
-        orderService.cancelOrder(id);
+    @PutMapping("/cancel")
+    @ApiOperation("取消订单")
+    public Result cancelOrderForAdmin(@RequestBody OrdersCancelDTO ordersCancelDTO){
+        log.info("要取消的订单id为:{}", ordersCancelDTO.getId());
+        orderService.cancelOrderForAdmin(ordersCancelDTO);
         return Result.success();
     }
 
@@ -50,5 +53,34 @@ public class OrderController {
     public Result<OrderStatisticsVO> countOrder(){
         OrderStatisticsVO statisticsVO = orderService.countOrder();
         return Result.success(statisticsVO);
+    }
+    
+    @PutMapping("/confirm")
+    @ApiOperation("接单")
+    public Result confirmOrder(@RequestBody OrdersConfirmDTO ordersConfirmDTO){
+        orderService.confirmOrder(ordersConfirmDTO);
+        return Result.success();
+    }
+
+    @PutMapping("/rejection")
+    @ApiOperation("拒单")
+    public Result rejectionOrder(@RequestBody OrdersRejectionDTO ordersRejectionDTO){
+        log.info("要拒绝的订单:{}",ordersRejectionDTO.getId());
+        orderService.rejectionOrder(ordersRejectionDTO);
+        return Result.success();
+    }
+
+    @PutMapping("/delivery/{id}")
+    public Result deliveryOrder(@PathVariable Long id){
+        log.info("要派送的订单为:{}", id);
+        orderService.deliveryOrder(id);
+        return Result.success();
+    }
+
+    @PutMapping("/complete/{id}")
+    public Result completeOrder(@PathVariable Long id){
+        log.info("完成配送的订单id为:{}", id);
+        orderService.completeOrder(id);
+        return Result.success();
     }
 }

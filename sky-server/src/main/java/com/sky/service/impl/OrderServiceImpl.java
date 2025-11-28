@@ -5,9 +5,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.AddressBook;
 import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
@@ -24,6 +22,7 @@ import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -245,4 +244,124 @@ public class OrderServiceImpl implements OrderService {
 
         return vo;
     }
+
+    @Override
+    /**
+     * 用于管理端的接单
+     */
+    public void confirmOrder(OrdersConfirmDTO ordersConfirmDTO) {
+        //根据id查询订单是否存在
+        Orders order = orderMapper.getOrderById(ordersConfirmDTO.getId());
+        if(order == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        //再看此时订单的状态
+        Integer status = order.getStatus();
+        //如果订单状态 1待付款 2待接单 3已接单 4派送中 5已完成 6已取消 7退款 不为2则抛出订单状态异常
+        if (status != 2){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        //然后对订单进行修改 修改订单的状态为已接单
+        ordersConfirmDTO.setStatus(Orders.CONFIRMED );
+        Orders orders = new Orders();
+        BeanUtils.copyProperties(ordersConfirmDTO, orders);
+        orderMapper.update(orders);
+    }
+
+    @Override
+    public void cancelOrderForAdmin(OrdersCancelDTO ordersCancelDTO) {
+        //根据id获取订单
+        Long id = ordersCancelDTO.getId();
+        Orders order = orderMapper.getOrderById(id);
+        // 校验订单是否存在
+        if (order == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        //订单状态 1待付款 2待接单 3已接单 4派送中 5已完成 6已取消
+        if (order.getStatus() != 3) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders cancelOrder = new Orders();
+        cancelOrder.setId(order.getId());
+        // 订单处于接单状态下取消，需要进行退款
+        if (order.getStatus().equals(Orders.CONFIRMED)) {
+            //支付状态修改为 退款
+            cancelOrder.setPayStatus(Orders.REFUND);
+        }
+        // 更新订单状态、取消原因、取消时间
+        cancelOrder.setStatus(Orders.CANCELLED);
+        cancelOrder.setCancelReason(ordersCancelDTO.getCancelReason());
+        cancelOrder.setCancelTime(LocalDateTime.now());
+        orderMapper.update(cancelOrder);
+    }
+
+    @Override
+    public void rejectionOrder(OrdersRejectionDTO ordersRejectionDTO) {
+        //根据id查询订单是否存在
+        Orders order = orderMapper.getOrderById(ordersRejectionDTO.getId());
+        if(order == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        //再看此时订单的状态
+        Integer status = order.getStatus();
+        //如果订单状态 1待付款 2待接单 3已接单 4派送中 5已完成 6已取消 7退款 不为2则抛出订单状态异常
+        if (status != 2){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        //然后对订单进行修改 设置拒单原因
+        Orders orders = new Orders();
+        // 订单处于接单状态下取消，需要进行退款
+        if (order.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            //支付状态修改为 退款
+            orders.setPayStatus(Orders.REFUND);
+        }
+
+        BeanUtils.copyProperties(order, orders);
+        orders.setRejectionReason(ordersRejectionDTO.getRejectionReason());
+        orders.setStatus(Orders.CANCELLED);
+        orders.setCancelTime(LocalDateTime.now());
+        orderMapper.update(orders);
+    }
+
+    @Override
+    /**
+     * 派送订单
+     */
+    public void deliveryOrder(Long id) {
+        //根据id查询订单
+        Orders order = orderMapper.getOrderById(id);
+        if (order == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        //查询订单状态
+        Integer status = order.getStatus();
+        if (status != 3){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders deliveryOrder = new Orders();
+        BeanUtils.copyProperties(order, deliveryOrder);
+        deliveryOrder.setStatus(Orders.DELIVERY_IN_PROGRESS);
+        orderMapper.update(deliveryOrder);
+    }
+
+    @Override
+    public void completeOrder(Long id) {
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getOrderById(id);
+
+        // 校验订单是否存在，并且状态为4
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders = new Orders();
+        orders.setId(ordersDB.getId());
+        // 更新订单状态,状态转为完成
+        orders.setStatus(Orders.COMPLETED);
+        orders.setDeliveryTime(LocalDateTime.now());
+
+        orderMapper.update(orders);
+    }
+
 }

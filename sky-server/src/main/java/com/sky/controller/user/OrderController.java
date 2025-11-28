@@ -71,7 +71,6 @@ public class OrderController {
 
     @PutMapping("/cancel/{id}")
     public Result cancelOrder(@PathVariable Long id){
-
         log.info("要取消的订单id为:{}", id);
         orderService.cancelOrder(id);
         return Result.success();

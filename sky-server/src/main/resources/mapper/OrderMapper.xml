@@ -24,10 +24,26 @@
     </update>
     <update id="update">
         update orders
-        set pay_status=#{payStatus},
-            status=#{status},
-            cancel_reason=#{cancelReason},
-            cancel_time=#{cancelTime}
+        <set>
+            <if test="payStatus != null">
+                pay_status = #{payStatus},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="cancelReason != null and cancelReason != ''">
+                cancel_reason = #{cancelReason},
+            </if>
+            <if test="cancelTime != null">
+                cancel_time = #{cancelTime},
+            </if>
+            <if test="deliveryTime != null">
+                delivery_time = #{deliveryTime},
+            </if>
+            <if test="rejectionReason != null and rejectionReason!= ''">
+                rejection_reason = #{rejectionReason}
+            </if>
+        </set>
         where id = #{id}
     </update>
     <select id="getOrderByNumber" resultType="com.sky.entity.Orders">
